@@ -1,14 +1,15 @@
 import 'package:google_generative_ai/google_generative_ai.dart';
+import '../core/config.dart';
 
 class GeminiService {
-  static const String _apiKey = "AIzaSyBogShSC8EUszgklDUb0_hC_uu7XQD-9L8";
+  static const String _apiKey = AppConfig.geminiApiKey;
   
   late final GenerativeModel _model;
   ChatSession? _chat;
 
   GeminiService() {
     _model = GenerativeModel(
-      model: 'gemini-1.5-flash',
+      model: AppConfig.geminiModel,
       apiKey: _apiKey,
       generationConfig: GenerationConfig(
         temperature: 0.7,
