@@ -3,6 +3,7 @@ import '../core/colors.dart';
 import '../widgets/raksha_card.dart';
 import 'sentiment_analyzer_screen.dart';
 import 'truth_dashboard_screen.dart';
+import 'truth_scanner_screen.dart';
 
 class TruthSelectionScreen extends StatelessWidget {
   const TruthSelectionScreen({super.key});
@@ -38,6 +39,8 @@ class TruthSelectionScreen extends StatelessWidget {
             _buildSentimentCard(context),
             const SizedBox(height: 20),
             _buildFactCheckerCard(context),
+            const SizedBox(height: 20),
+            _buildScannerTruthCard(context),
             const SizedBox(height: 32),
             _buildBottomNote(),
           ],
@@ -141,6 +144,42 @@ class TruthSelectionScreen extends StatelessWidget {
                     Text('Fact Checker (Scanner)', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                     Text(
                       'Scan red flags pada klaim influencer, berita, dan link mencurigakan.',
+                      style: TextStyle(fontSize: 13, color: RakshaColors.textGray),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right, color: RakshaColors.textLight),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildScannerTruthCard(BuildContext context) {
+    return RakshaCard(
+      padding: EdgeInsets.zero,
+      child: InkWell(
+        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const TruthScannerScreen())),
+        borderRadius: BorderRadius.circular(24),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(color: RakshaColors.primary.withOpacity(0.1), shape: BoxShape.circle),
+                child: const Icon(Icons.qr_code_scanner, color: RakshaColors.primary, size: 28),
+              ),
+              const SizedBox(width: 20),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Scanner Truth', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    Text(
+                      'AI Deep-scan untuk klaim influencer, berita, dan link mencurigakan.',
                       style: TextStyle(fontSize: 13, color: RakshaColors.textGray),
                     ),
                   ],
