@@ -21,7 +21,7 @@ class RakshaApp extends StatelessWidget {
       title: 'Raksha AI',
       debugShowCheckedModeBanner: false,
       theme: RakshaTheme.lightTheme,
-      home: const MainNavigation(),
+      home: MainNavigation(key: MainNavigation.navigationKey),
     );
   }
 }
@@ -29,8 +29,15 @@ class RakshaApp extends StatelessWidget {
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
 
-  static MainNavigationState? of(BuildContext context) =>
-      context.findAncestorStateOfType<MainNavigationState>();
+  static final GlobalKey<MainNavigationState> navigationKey = GlobalKey<MainNavigationState>();
+
+  static MainNavigationState? of(BuildContext? context) {
+    if (context != null) {
+      final state = context.findAncestorStateOfType<MainNavigationState>();
+      if (state != null) return state;
+    }
+    return navigationKey.currentState;
+  }
 
   @override
   State<MainNavigation> createState() => MainNavigationState();

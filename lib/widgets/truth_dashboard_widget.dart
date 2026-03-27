@@ -266,29 +266,50 @@ class _TruthDashboardWidgetState extends State<TruthDashboardWidget> {
                     Row(
                       children: [
                         Expanded(
-                          child: _actionButton(
-                            isLoadingInsight ? 'Menganalisis...' : 'Insight Cepat (AI)',
-                            Icons.auto_awesome_outlined,
-                            isPrimary: false,
-                            onTap: () => _fetchAIInsight(index, stock['symbol']),
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              _fetchAIInsight(index, stock['symbol']);
+                            },
+                            icon: Icon(isLoadingInsight ? Icons.hourglass_empty : Icons.auto_awesome_outlined, size: 16),
+                            label: Text(isLoadingInsight ? 'Menganalisis...' : 'Insight Cepat (AI)', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: RakshaColors.textDark,
+                              backgroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              side: const BorderSide(color: Colors.black12),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
                           ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
-                          child: _actionButton(
-                            'Chat AI Detailnya',
-                            Icons.chat_bubble_outline,
-                            isPrimary: true,
-                            onTap: () {
-                              MainNavigation.of(context)?.setIndex(
-                                4,
-                                stockContext: {
-                                  'symbol': stock['symbol'],
-                                  'name': stock['name'],
-                                  'score': stock['score'],
-                                },
-                              );
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              final nav = MainNavigation.of(context);
+                              if (nav != null) {
+                                // Pop the dashboard screen first to return to MainNavigation
+                                Navigator.of(context).pop();
+                                
+                                // Then switch to Chat tab with context
+                                nav.setIndex(
+                                  4,
+                                  stockContext: {
+                                    'symbol': stock['symbol'],
+                                    'name': stock['name'],
+                                    'score': stock['score'],
+                                  },
+                                );
+                              }
                             },
+                            icon: const Icon(Icons.chat_bubble_outline, size: 16),
+                            label: const Text('Chat AI Detailnya', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: RakshaColors.textDark,
+                              backgroundColor: const Color(0xFFE2E8F0),
+                              elevation: 0,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
                           ),
                         ),
                       ],
