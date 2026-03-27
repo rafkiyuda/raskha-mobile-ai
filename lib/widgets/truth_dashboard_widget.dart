@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../core/colors.dart';
 import '../widgets/raksha_card.dart';
 import '../services/idx_service.dart';
+import '../main.dart';
 
 class TruthDashboardWidget extends StatefulWidget {
   const TruthDashboardWidget({super.key});
@@ -13,11 +14,36 @@ class TruthDashboardWidget extends StatefulWidget {
 
 class _TruthDashboardWidgetState extends State<TruthDashboardWidget> {
   late List<Map<String, dynamic>> _data;
+  final Map<int, String?> _aiInsights = {};
+  final Set<int> _loadingInsights = {};
 
   @override
   void initState() {
     super.initState();
     _data = IdxService.getFinancialIntegrityData();
+  }
+
+  Future<void> _fetchAIInsight(int index, String symbol) async {
+    if (_loadingInsights.contains(index)) return;
+
+    setState(() {
+      _loadingInsights.add(index);
+    });
+
+    try {
+      final insight = await IdxService.getAIInsight(symbol);
+      setState(() {
+        _aiInsights[index] = insight;
+      });
+    } catch (e) {
+      setState(() {
+        _aiInsights[index] = 'Gagal memuat insight dari AI. Silakan coba lagi nanti.';
+      });
+    } finally {
+      setState(() {
+        _loadingInsights.remove(index);
+      });
+    }
   }
 
   @override
@@ -70,7 +96,7 @@ class _TruthDashboardWidgetState extends State<TruthDashboardWidget> {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          SizedBox(
+          const SizedBox(
             width: 140,
             height: 140,
             child: CircularProgressIndicator(
@@ -126,6 +152,8 @@ class _TruthDashboardWidgetState extends State<TruthDashboardWidget> {
     final bool isExpanded = stock['isExpanded'] ?? false;
     final int score = stock['score'];
     final Color scoreColor = score >= 70 ? Colors.green : (score >= 40 ? Colors.orange : Colors.red);
+    final bool isLoadingInsight = _loadingInsights.contains(index);
+    final String? aiInsight = _aiInsights[index];
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -237,11 +265,63 @@ class _TruthDashboardWidgetState extends State<TruthDashboardWidget> {
                     const SizedBox(height: 20),
                     Row(
                       children: [
-                        Expanded(child: _actionButton('Insight Cepat (AI)', Icons.auto_awesome_outlined, isPrimary: false)),
+                        Expanded(
+                          child: _actionButton(
+                            isLoadingInsight ? 'Menganalisis...' : 'Insight Cepat (AI)',
+                            Icons.auto_awesome_outlined,
+                            isPrimary: false,
+                            onTap: () => _fetchAIInsight(index, stock['symbol']),
+                          ),
+                        ),
                         const SizedBox(width: 12),
-                        Expanded(child: _actionButton('Chat AI Detailnya', Icons.chat_bubble_outline, isPrimary: true)),
+                        Expanded(
+                          child: _actionButton(
+                            'Chat AI Detailnya',
+                            Icons.chat_bubble_outline,
+                            isPrimary: true,
+                            onTap: () {
+                              MainNavigation.of(context)?.setIndex(
+                                4,
+                                stockContext: {
+                                  'symbol': stock['symbol'],
+                                  'name': stock['name'],
+                                  'score': stock['score'],
+                                },
+                              );
+                            },
+                          ),
+                        ),
                       ],
                     ),
+                    if (aiInsight != null) ...[
+                      const SizedBox(height: 20),
+                      const Text(
+                        'AI FUNDAMENTAL INSIGHT',
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: RakshaColors.textGray),
+                      ),
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.purple.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.purple.withOpacity(0.1)),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Icon(Icons.psychology, color: Colors.purple, size: 20),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                aiInsight,
+                                style: const TextStyle(fontSize: 13, color: RakshaColors.textDark, height: 1.5),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -275,21 +355,25 @@ class _TruthDashboardWidgetState extends State<TruthDashboardWidget> {
     );
   }
 
-  Widget _actionButton(String label, IconData icon, {required bool isPrimary}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      decoration: BoxDecoration(
-        color: isPrimary ? const Color(0xFFE2E8F0) : Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: isPrimary ? null : Border.all(color: Colors.black12),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 16, color: RakshaColors.textDark),
-          const SizedBox(width: 8),
-          Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: RakshaColors.textDark)),
-        ],
+  Widget _actionButton(String label, IconData icon, {required bool isPrimary, VoidCallback? onTap}) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: isPrimary ? const Color(0xFFE2E8F0) : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: isPrimary ? null : Border.all(color: Colors.black12),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 16, color: RakshaColors.textDark),
+            const SizedBox(width: 8),
+            Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: RakshaColors.textDark)),
+          ],
+        ),
       ),
     );
   }

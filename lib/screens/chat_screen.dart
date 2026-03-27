@@ -6,17 +6,17 @@ import '../services/gemini_service.dart';
 
 class ChatScreen extends StatefulWidget {
   final String? initialMessage;
+  final Map<String, dynamic>? stockContext;
   final VoidCallback? onMessageConsumed;
-  const ChatScreen({super.key, this.initialMessage, this.onMessageConsumed});
+  const ChatScreen({super.key, this.initialMessage, this.stockContext, this.onMessageConsumed});
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  final List<Map<String, dynamic>> _messages = [
-    {'role': 'ai', 'type': 'text', 'text': 'Halo Sherine! Saya Raksha AI Co-Pilot. Ada yang bisa saya bantu terkait risiko investasi Anda hari ini?'},
-  ];
+  late final List<Map<String, dynamic>> _messages;
+  Map<String, dynamic>? _activeStockContext;
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final GeminiService _gemini = GeminiService();
@@ -25,6 +25,16 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
+    _activeStockContext = widget.stockContext;
+    
+    final greeting = _activeStockContext != null 
+      ? 'Halo! Saya RAKSHA AI, Co-Pilot finansialmu. Mari kita amankan portofoliomu. Ada detail terkait ${_activeStockContext!['symbol']} yang ingin dibahas?'
+      : 'Halo Sherine! Saya Raksha AI Co-Pilot. Ada yang bisa saya bantu terkait risiko investasi Anda hari ini?';
+
+    _messages = [
+      {'role': 'ai', 'type': 'text', 'text': greeting},
+    ];
+
     if (widget.initialMessage != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _sendInitialContext(widget.initialMessage ?? '');
@@ -36,6 +46,19 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void didUpdateWidget(ChatScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (widget.stockContext != oldWidget.stockContext) {
+      setState(() {
+        _activeStockContext = widget.stockContext;
+        if (_activeStockContext != null) {
+          _messages.add({
+            'role': 'ai', 
+            'type': 'text', 
+            'text': 'Konteks diperbarui: ${_activeStockContext!['symbol']}. Apa yang ingin Anda ketahui lebih lanjut?'
+          });
+        }
+      });
+      _scrollToBottom();
+    }
     if (widget.initialMessage != null && widget.initialMessage != oldWidget.initialMessage) {
       _sendInitialContext(widget.initialMessage ?? '');
       widget.onMessageConsumed?.call();
@@ -81,6 +104,10 @@ class _ChatScreenState extends State<ChatScreen> {
     final text = _controller.text;
     if (text.isEmpty || _isLoading) return;
 
+    final String contextSuffix = _activeStockContext != null 
+        ? ' [Context: ${_activeStockContext!['symbol']} (Score: ${_activeStockContext!['score']})]' 
+        : '';
+
     setState(() {
       _messages.add({'role': 'user', 'type': 'text', 'text': text});
       _isLoading = true;
@@ -88,7 +115,7 @@ class _ChatScreenState extends State<ChatScreen> {
     });
     _scrollToBottom();
 
-    final response = await _gemini.sendMessage(text);
+    final response = await _gemini.sendMessage(text + contextSuffix);
 
     if (mounted) {
       setState(() {
@@ -219,25 +246,75 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget _buildInput() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (_activeStockContext != null) _buildContextAttachment(),
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(color: Colors.white, border: Border(top: BorderSide(color: Colors.black12))),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _controller,
+                  enabled: !_isLoading,
+                  decoration: InputDecoration(
+                    hintText: _activeStockContext != null ? 'Tanya detail emiten ini...' : 'Tanyakan sesuatu...',
+                    border: InputBorder.none,
+                  ),
+                  onSubmitted: (_) => _sendMessage(),
+                ),
+              ),
+              IconButton(
+                onPressed: _isLoading ? null : _sendMessage,
+                icon: Icon(Icons.send, color: _isLoading ? Colors.grey : RakshaColors.primary),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildContextAttachment() {
     return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(color: Colors.white, border: Border(top: BorderSide(color: Colors.black12))),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      decoration: BoxDecoration(
+        color: RakshaColors.bgSlate,
+        border: Border(top: BorderSide(color: Colors.black12)),
+      ),
       child: Row(
         children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8)),
+            child: Text(
+              '${_activeStockContext!['score']}',
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: RakshaColors.primary),
+            ),
+          ),
+          const SizedBox(width: 12),
           Expanded(
-            child: TextField(
-              controller: _controller,
-              enabled: !_isLoading,
-              decoration: const InputDecoration(
-                hintText: 'Tanyakan sesuatu...',
-                border: InputBorder.none,
-              ),
-              onSubmitted: (_) => _sendMessage(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Akan dianalisis: ${_activeStockContext!['symbol']}',
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: RakshaColors.textDark),
+                ),
+                const Text(
+                  'Lampiran ini akan dikirim bersama pesanmu',
+                  style: TextStyle(fontSize: 10, color: RakshaColors.textGray),
+                ),
+              ],
             ),
           ),
           IconButton(
-            onPressed: _isLoading ? null : _sendMessage,
-            icon: Icon(Icons.send, color: _isLoading ? Colors.grey : RakshaColors.primary),
+            onPressed: () => setState(() => _activeStockContext = null),
+            icon: const Icon(Icons.close, size: 16, color: RakshaColors.textGray),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
           ),
         ],
       ),

@@ -56,7 +56,7 @@ class MainNavigationState extends State<MainNavigation> {
     ];
   }
 
-  void setIndex(int index, {String? initialMessage}) {
+  void setIndex(int index, {String? initialMessage, Map<String, dynamic>? stockContext}) {
     setState(() {
       if (index == 4) { // Chat
         _selectedIndex = 4;
@@ -64,10 +64,11 @@ class MainNavigationState extends State<MainNavigation> {
         _selectedIndex = index;
       }
       
-      if (initialMessage != null) {
+      if (initialMessage != null || stockContext != null) {
         _initialChatMessage = initialMessage;
         _screens[4] = ChatScreen(
           initialMessage: _initialChatMessage,
+          stockContext: stockContext,
           onMessageConsumed: _clearInitialMessage,
         );
       }

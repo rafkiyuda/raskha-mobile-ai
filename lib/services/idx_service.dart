@@ -112,4 +112,17 @@ class IdxService {
       },
     ];
   }
+  static Future<String> getAIInsight(String symbol) async {
+    // Simulate API delay
+    await Future.delayed(const Duration(seconds: 2));
+    
+    final insights = {
+      'BBCA': 'BBCA menunjukkan integritas laba yang sangat kuat (Alignment 92%). Pertumbuhan laba bersih didukung penuh oleh arus kas operasional, menandakan kualitas laba yang tinggi. Ekspansi kredit tetap terjaga dengan NPL rendah.',
+      'TLKM': 'TLKM memiliki skor integritas stabil (85%). Meskipun arus kas sedikit tertinggal akibat belanja modal (CAPEX) 5G yang masif, namun profil profitabilitas tetap sehat tanpa anomali akuntansi yang signifikan.',
+      'GOTO': 'GOTO menunjukkan perbaikan efisiensi yang signifikan. Meskipun skor integritas masih moderat (52%), tren penyusutan rugi bersih mulai selaras dengan efisiensi biaya operasional yang konsisten.',
+      'ASII': 'ASII mempertahankan skor tinggi (78%). Diversifikasi bisnis yang kuat menopang arus kas yang solid, meskipun terdapat tekanan di sektor komoditas yang memengaruhi margin kontribusi anak usaha.',
+    };
+
+    return insights[symbol] ?? 'Analisis AI menunjukkan emiten ini memiliki profil risiko yang terjaga dengan transparansi laporan keuangan yang memadai bagi investor jangka menengah.';
+  }
 }
