@@ -129,18 +129,119 @@ class MainNavigationState extends State<MainNavigation> {
   }
 
   Widget _buildBottomBar() {
-    return BottomNavigationBar(
-      currentIndex: _selectedIndex == 5 ? 0 : _selectedIndex,
-      onTap: (index) => setIndex(index),
-      type: BottomNavigationBarType.fixed,
-      selectedItemColor: RakshaColors.primary,
-      unselectedItemColor: RakshaColors.textGray,
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home), label: 'Home'),
-        BottomNavigationBarItem(icon: Icon(Icons.emoji_events_outlined), activeIcon: Icon(Icons.emoji_events), label: 'Journey'),
-        BottomNavigationBarItem(icon: Icon(Icons.analytics_outlined), activeIcon: Icon(Icons.analytics), label: 'Truth'),
-        BottomNavigationBarItem(icon: Icon(Icons.warning_amber_rounded), activeIcon: Icon(Icons.warning), label: 'Crisis'),
-        BottomNavigationBarItem(icon: Icon(Icons.person_outline), activeIcon: Icon(Icons.person), label: 'Profile'),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 15, offset: const Offset(0, -2)),
+        ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: Stack(
+          alignment: Alignment.center,
+          clipBehavior: Clip.none,
+          children: [
+            Container(
+              height: 60,
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildNavItem(0, Icons.home_outlined, Icons.home, 'Home'),
+                  _buildNavItem(1, Icons.emoji_events_outlined, Icons.emoji_events, 'Journey'),
+                  const SizedBox(width: 60), // Space for Truth highlight
+                  _buildNavItem(3, Icons.warning_amber_rounded, Icons.warning, 'Crisis'),
+                  _buildNavItem(4, Icons.person_outline, Icons.person, 'Profile'),
+                ],
+              ),
+            ),
+            Positioned(
+              top: -24,
+              child: _buildTruthHighlight(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem(int index, IconData icon, IconData activeIcon, String label) {
+    final isSelected = _selectedIndex == index;
+    return InkWell(
+      onTap: () => setIndex(index),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              isSelected ? activeIcon : icon,
+              color: isSelected ? RakshaColors.primary : RakshaColors.textGray,
+              size: 24,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? RakshaColors.primary : RakshaColors.textGray,
+                fontSize: 10,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTruthHighlight() {
+    final isSelected = _selectedIndex == 2;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        GestureDetector(
+          onTap: () => setIndex(2),
+          child: AnimatedScale(
+            scale: isSelected ? 1.05 : 1.0,
+            duration: const Duration(milliseconds: 200),
+            child: Container(
+              width: 58,
+              height: 58,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    RakshaColors.primary,
+                    RakshaColors.primary.withAlpha(200),
+                  ],
+                ),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: RakshaColors.primary.withOpacity(0.25),
+                    blurRadius: 15,
+                    spreadRadius: 1,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+                border: Border.all(color: Colors.white, width: 2.5),
+              ),
+              child: const Icon(Icons.analytics_rounded, color: Colors.white, size: 26),
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'Truth',
+          style: TextStyle(
+            color: isSelected ? RakshaColors.primary : RakshaColors.textGray,
+            fontSize: 10,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
       ],
     );
   }

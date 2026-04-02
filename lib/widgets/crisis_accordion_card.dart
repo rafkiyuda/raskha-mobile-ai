@@ -65,7 +65,15 @@ class _CrisisAccordionCardState extends State<CrisisAccordionCard> {
                         style: const TextStyle(color: RakshaColors.textDark, fontWeight: FontWeight.bold, fontSize: 18),
                       ),
                       const SizedBox(width: 8),
-                      ...widget.tags.map((tag) => _buildTag(tag)).toList(),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          physics: const BouncingScrollPhysics(),
+                          child: Row(
+                            children: widget.tags.map((tag) => _buildTag(tag)).toList(),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                   Text(
