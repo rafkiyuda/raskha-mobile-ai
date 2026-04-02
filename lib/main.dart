@@ -53,6 +53,7 @@ class MainNavigationState extends State<MainNavigation> {
     super.initState();
     _screens = [
       const HomeScreen(),
+      const LearningScreen(),
       const TruthSelectionScreen(),
       const CrisisPlaybookScreen(),
       const ProfileScreen(),
@@ -65,15 +66,15 @@ class MainNavigationState extends State<MainNavigation> {
 
   void setIndex(int index, {String? initialMessage, Map<String, dynamic>? stockContext}) {
     setState(() {
-      if (index == 4) { // Chat
-        _selectedIndex = 4;
+      if (index == 5) { // Chat
+        _selectedIndex = 5;
       } else {
         _selectedIndex = index;
       }
       
       if (initialMessage != null || stockContext != null) {
         _initialChatMessage = initialMessage;
-        _screens[4] = ChatScreen(
+        _screens[5] = ChatScreen(
           initialMessage: _initialChatMessage,
           stockContext: stockContext,
           onMessageConsumed: _clearInitialMessage,
@@ -94,15 +95,18 @@ class MainNavigationState extends State<MainNavigation> {
       case 0:
         break;
       case 1:
-        appBar = null; // Truth Hub has its own AppBar
+        appBar = null; // LearningScreen has its own TabController and AppBar
         break;
       case 2:
-        appBar = AppBar(title: const Text('Crisis Playbook', style: TextStyle(fontWeight: FontWeight.bold)), centerTitle: true);
+        appBar = null; // TruthHub has its own AppBar
         break;
       case 3:
-        appBar = AppBar(title: const Text('Profile', style: TextStyle(fontWeight: FontWeight.bold)), centerTitle: true);
+        appBar = AppBar(title: const Text('Crisis Playbook', style: TextStyle(fontWeight: FontWeight.bold)), centerTitle: true);
         break;
       case 4:
+        appBar = AppBar(title: const Text('Profile', style: TextStyle(fontWeight: FontWeight.bold)), centerTitle: true);
+        break;
+      case 5:
         appBar = AppBar(title: const Text('AI Co-Pilot', style: TextStyle(fontWeight: FontWeight.bold)), centerTitle: true);
         break;
     }
@@ -115,9 +119,9 @@ class MainNavigationState extends State<MainNavigation> {
     return Scaffold(
       appBar: appBar,
       body: body,
-      bottomNavigationBar: _selectedIndex == 4 ? null : _buildBottomBar(),
-      floatingActionButton: _selectedIndex == 4 ? null : FloatingActionButton(
-        onPressed: () => setIndex(4),
+      bottomNavigationBar: _selectedIndex == 5 ? null : _buildBottomBar(),
+      floatingActionButton: _selectedIndex == 5 ? null : FloatingActionButton(
+        onPressed: () => setIndex(5),
         backgroundColor: RakshaColors.primary,
         child: const Icon(Icons.chat_bubble, color: Colors.white),
       ),
@@ -126,13 +130,14 @@ class MainNavigationState extends State<MainNavigation> {
 
   Widget _buildBottomBar() {
     return BottomNavigationBar(
-      currentIndex: _selectedIndex == 4 ? 0 : _selectedIndex,
+      currentIndex: _selectedIndex == 5 ? 0 : _selectedIndex,
       onTap: (index) => setIndex(index),
       type: BottomNavigationBarType.fixed,
       selectedItemColor: RakshaColors.primary,
       unselectedItemColor: RakshaColors.textGray,
       items: const [
         BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home), label: 'Home'),
+        BottomNavigationBarItem(icon: Icon(Icons.emoji_events_outlined), activeIcon: Icon(Icons.emoji_events), label: 'Journey'),
         BottomNavigationBarItem(icon: Icon(Icons.analytics_outlined), activeIcon: Icon(Icons.analytics), label: 'Truth'),
         BottomNavigationBarItem(icon: Icon(Icons.warning_amber_rounded), activeIcon: Icon(Icons.warning), label: 'Crisis'),
         BottomNavigationBarItem(icon: Icon(Icons.person_outline), activeIcon: Icon(Icons.person), label: 'Profile'),

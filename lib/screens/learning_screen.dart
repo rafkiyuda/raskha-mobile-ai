@@ -119,8 +119,13 @@ class _LearningJourneyTab extends StatelessWidget {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          _buildKiaUpdateNotice(),
+          const SizedBox(height: 20),
           _buildRankCard(),
+          const SizedBox(height: 32),
+          _buildLearningPath(),
           const SizedBox(height: 32),
           _buildAchievements(),
         ],
@@ -128,8 +133,175 @@ class _LearningJourneyTab extends StatelessWidget {
     );
   }
 
+  Widget _buildKiaUpdateNotice() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: RakshaColors.primary.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: RakshaColors.primary.withOpacity(0.2)),
+      ),
+      child: const Row(
+        children: [
+          Icon(Icons.info_outline, color: RakshaColors.primary, size: 20),
+          SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              'Konten diperbarui setiap hari oleh KIA AI berdasarkan kondisi pasar terbaru.',
+              style: TextStyle(fontSize: 12, color: RakshaColors.textDark, fontWeight: FontWeight.w500),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLearningPath() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('YOUR LEARNING PATH', style: TextStyle(color: RakshaColors.textGray, fontSize: 13, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 24),
+        _buildPathNode(
+          title: 'Cash Flow vs Net Profit',
+          desc: 'Memahami perbedaan mendasar aliran kas dan laba bersih.',
+          xp: '+150 XP',
+          status: 'completed',
+          isLast: false,
+        ),
+        _buildPathNode(
+          title: 'Analisis Hutang Emiten',
+          desc: 'Cara melihat kesehatan keuangan lewat rasio hutang.',
+          xp: '+200 XP',
+          status: 'active',
+          isLast: false,
+        ),
+        _buildPathNode(
+          title: 'Psikologi FOMO',
+          desc: 'Menghindari emosi saat pasar sedang bullish.',
+          xp: '+150 XP',
+          status: 'locked',
+          isLast: true,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPathNode({
+    required String title,
+    required String desc,
+    required String xp,
+    required String status,
+    required bool isLast,
+  }) {
+    Color nodeColor;
+    Widget icon;
+
+    if (status == 'completed') {
+      nodeColor = RakshaColors.primary;
+      icon = const Icon(Icons.check, color: Colors.white, size: 16);
+    } else if (status == 'active') {
+      nodeColor = RakshaColors.primary;
+      icon = const Icon(Icons.play_arrow, color: Colors.white, size: 16);
+    } else {
+      nodeColor = Colors.grey[300]!;
+      icon = const Icon(Icons.lock, color: Colors.white, size: 14);
+    }
+
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Column(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(color: nodeColor, shape: BoxShape.circle),
+                child: Center(child: icon),
+              ),
+              if (!isLast)
+                Expanded(
+                  child: Container(
+                    width: 2,
+                    color: nodeColor.withOpacity(0.3),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 32),
+              child: RakshaCard(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            title,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: status == 'locked' ? RakshaColors.textGray : RakshaColors.textDark,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: RakshaColors.primary.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            xp,
+                            style: const TextStyle(color: RakshaColors.primary, fontSize: 10, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      desc,
+                      style: const TextStyle(fontSize: 12, color: RakshaColors.textGray),
+                    ),
+                    if (status == 'active') ...[
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {},
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: RakshaColors.primary,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          child: const Text('Mulai Pelajaran', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildRankCard() {
     return RakshaCard(
+      backgroundIcon: Icons.emoji_events,
+      backgroundIconSize: 160,
+      backgroundIconOpacity: 0.15,
+      backgroundIconOffset: const Offset(1.0, 0.45),
       child: Column(
         children: [
           Row(
@@ -275,6 +447,18 @@ class _AchievementCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return RakshaCard(
       padding: const EdgeInsets.all(12),
+      backgroundWidget: Positioned(
+        right: -15,
+        top: -15,
+        child: Container(
+          width: 70,
+          height: 70,
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.08),
+            shape: BoxShape.circle,
+          ),
+        ),
+      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

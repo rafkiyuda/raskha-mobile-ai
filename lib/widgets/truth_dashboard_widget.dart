@@ -96,6 +96,11 @@ class _TruthDashboardWidgetState extends State<TruthDashboardWidget> {
       child: Stack(
         alignment: Alignment.center,
         children: [
+          // Background motif
+          Opacity(
+            opacity: 0.04,
+            child: Icon(Icons.analytics_outlined, size: 180, color: RakshaColors.primary),
+          ),
           const SizedBox(
             width: 140,
             height: 140,
@@ -114,7 +119,7 @@ class _TruthDashboardWidgetState extends State<TruthDashboardWidget> {
                 '73',
                 style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: RakshaColors.textDark),
               ),
-              Text(
+              const Text(
                 'Average Score',
                 style: TextStyle(fontSize: 10, color: RakshaColors.textGray),
               ),
@@ -159,6 +164,10 @@ class _TruthDashboardWidgetState extends State<TruthDashboardWidget> {
       padding: const EdgeInsets.only(bottom: 12),
       child: RakshaCard(
         padding: EdgeInsets.zero,
+        backgroundIcon: Icons.verified_user_outlined,
+        backgroundIconSize: 120,
+        backgroundIconOpacity: 0.04,
+        backgroundIconOffset: const Offset(1.1, 0.45),
         child: Column(
           children: [
             InkWell(
@@ -197,6 +206,13 @@ class _TruthDashboardWidgetState extends State<TruthDashboardWidget> {
                         children: [
                           Row(
                             children: [
+                              Image.asset(
+                                'assets/images/logos/${stock['symbol'].toLowerCase()}.png',
+                                width: 20,
+                                height: 20,
+                                errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+                              ),
+                              const SizedBox(width: 8),
                               Text(stock['symbol'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                               const SizedBox(width: 6),
                               Container(

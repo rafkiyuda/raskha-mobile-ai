@@ -140,6 +140,8 @@ Berikan jawaban dalam format JSON mentah (hanya JSON, tanpa markdown) dengan str
       ),
       child: TabBar(
         controller: _tabController,
+        indicatorSize: TabBarIndicatorSize.tab,
+        indicatorPadding: const EdgeInsets.all(4),
         indicator: BoxDecoration(
           color: RakshaColors.primary,
           borderRadius: BorderRadius.circular(10),

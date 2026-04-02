@@ -11,19 +11,32 @@ class SentimentAnalyzerScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final feed = IdxService.getSentimentFeed();
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('IndoBERT-powered bias detection', style: TextStyle(color: RakshaColors.textGray, fontSize: 13)),
-          const SizedBox(height: 24),
-          _buildSentimentMeter(),
-          const SizedBox(height: 32),
-          const Text('STOCK SENTIMENT FEED', style: TextStyle(color: RakshaColors.textGray, fontSize: 13, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 16),
-          ...feed.map((f) => _buildSentimentCard(context, f)),
-        ],
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text('Sentiment AI', style: TextStyle(color: RakshaColors.textDark, fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: RakshaColors.textDark),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('IndoBERT-powered bias detection', style: TextStyle(color: RakshaColors.textGray, fontSize: 13)),
+            const SizedBox(height: 24),
+            _buildSentimentMeter(),
+            const SizedBox(height: 32),
+            const Text('STOCK SENTIMENT FEED', style: TextStyle(color: RakshaColors.textGray, fontSize: 13, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            ...feed.map((f) => _buildSentimentCard(context, f)),
+          ],
+        ),
       ),
     );
   }
@@ -102,7 +115,9 @@ class SentimentAnalyzerScreen extends StatelessWidget {
           'Fundamental': '${data['fundamental']}',
         },
         socialHype: data['score'],
-        sourceDistribution: Map<String, double>.from(data['sources']),
+        sourceDistribution: (data['sources'] as Map<String, dynamic>).map(
+          (key, value) => MapEntry(key, (value as num).toDouble()),
+        ),
       ),
     );
   }

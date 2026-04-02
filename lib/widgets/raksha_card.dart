@@ -7,6 +7,11 @@ class RakshaCard extends StatelessWidget {
   final bool isGlass;
   final Color? color;
   final EdgeInsetsGeometry? padding;
+  final IconData? backgroundIcon;
+  final double backgroundIconSize;
+  final Offset backgroundIconOffset;
+  final double backgroundIconOpacity;
+  final Widget? backgroundWidget;
 
   const RakshaCard({
     super.key,
@@ -15,6 +20,11 @@ class RakshaCard extends StatelessWidget {
     this.isGlass = false,
     this.color,
     this.padding,
+    this.backgroundIcon,
+    this.backgroundIconSize = 140,
+    this.backgroundIconOffset = const Offset(0.85, 0.45), // 0.0 to 1.0 relative
+    this.backgroundIconOpacity = 0.15,
+    this.backgroundWidget,
   });
 
   @override
@@ -42,9 +52,30 @@ class RakshaCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(24),
             border: isGlass ? Border.all(color: Colors.white.withOpacity(0.3)) : null,
           ),
-          child: Padding(
-            padding: padding ?? const EdgeInsets.all(20),
-            child: child,
+          child: Stack(
+            children: [
+              // Background Decorations
+              if (backgroundIcon != null)
+                Positioned(
+                  right: -backgroundIconSize * (1 - backgroundIconOffset.dx),
+                  bottom: -backgroundIconSize * (1 - backgroundIconOffset.dy),
+                  child: Opacity(
+                    opacity: backgroundIconOpacity,
+                    child: Icon(
+                      backgroundIcon,
+                      size: backgroundIconSize,
+                      color: isEmerald || isGlass ? Colors.white : Colors.black,
+                    ),
+                  ),
+                ),
+              if (backgroundWidget != null) backgroundWidget!,
+              
+              // Foreground Content
+              Padding(
+                padding: padding ?? const EdgeInsets.all(20),
+                child: child,
+              ),
+            ],
           ),
         ),
       ),

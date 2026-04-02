@@ -69,32 +69,46 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildHeader(BuildContext context) {
-    return Row(
+    return Stack(
+      clipBehavior: Clip.none,
       children: [
-        GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () => MainNavigation.of(context)?.setIndex(4),
-          child: CircleAvatar(
-            backgroundColor: RakshaColors.primary.withOpacity(0.1),
-            child: const Text('S', style: TextStyle(color: RakshaColors.primary, fontWeight: FontWeight.bold)),
+        // Background patterns (Clouds)
+        Positioned(
+          left: -10,
+          top: -20,
+          child: Opacity(
+            opacity: 0.05,
+            child: Icon(Icons.cloud, size: 70, color: RakshaColors.primary),
           ),
         ),
-        const SizedBox(width: 12),
-        const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        Row(
           children: [
-            Text('Welcome back,', style: TextStyle(color: RakshaColors.textGray, fontSize: 12)),
-            Text('Sherine', style: TextStyle(color: RakshaColors.textDark, fontSize: 18, fontWeight: FontWeight.bold)),
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => MainNavigation.of(context)?.setIndex(4),
+              child: CircleAvatar(
+                backgroundColor: RakshaColors.primary.withOpacity(0.1),
+                child: const Text('S', style: TextStyle(color: RakshaColors.primary, fontWeight: FontWeight.bold)),
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Welcome back,', style: TextStyle(color: RakshaColors.textGray, fontSize: 12)),
+                Text('Sherine', style: TextStyle(color: RakshaColors.textDark, fontSize: 18, fontWeight: FontWeight.bold)),
+              ],
+            ),
+            const Spacer(),
+            IconButton(
+              icon: const Icon(Icons.notifications_none, color: RakshaColors.textDark),
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Notifications coming soon')),
+                );
+              },
+            ),
           ],
-        ),
-        const Spacer(),
-        IconButton(
-          icon: const Icon(Icons.notifications_none, color: RakshaColors.textDark),
-          onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Notifications coming soon')),
-            );
-          },
         ),
       ],
     );
@@ -103,6 +117,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildPortfolioCard() {
     return RakshaCard(
       isEmerald: true,
+      backgroundIcon: Icons.account_balance_wallet,
+      backgroundIconSize: 180,
+      backgroundIconOpacity: 0.12,
+      backgroundIconOffset: const Offset(1.1, 0.4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -331,10 +349,15 @@ class _ExpandableStockCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      CircleAvatar(
-                        radius: 18,
-                        backgroundColor: Colors.black12,
-                        child: Text(stock.symbol[0], style: const TextStyle(color: RakshaColors.textDark, fontSize: 14)),
+                      Image.asset(
+                        'assets/images/logos/${stock.symbol.toLowerCase()}.png',
+                        width: 36,
+                        height: 36,
+                        errorBuilder: (context, error, stackTrace) => CircleAvatar(
+                          radius: 18,
+                          backgroundColor: Colors.black12,
+                          child: Text(stock.symbol[0], style: const TextStyle(color: RakshaColors.textDark, fontSize: 14)),
+                        ),
                       ),
                       const SizedBox(width: 12),
                       Column(

@@ -106,11 +106,15 @@ class _CrisisAccordionCardState extends State<CrisisAccordionCard> {
     return Container(
       width: 44,
       height: 44,
+      padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: RakshaColors.primary.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: const Icon(Icons.local_fire_department, color: RakshaColors.primary, size: 24),
+      child: Image.asset(
+        'assets/images/logos/${widget.symbol.toLowerCase()}.png',
+        errorBuilder: (context, error, stackTrace) => const Icon(Icons.local_fire_department, color: RakshaColors.primary, size: 24),
+      ),
     );
   }
 

@@ -67,6 +67,7 @@ flutter:
     - assets/images/news_crypto_trends.png
     - assets/images/video_thumb_market.png
     - assets/images/video_thumb_saving.png
+    - assets/images/logos/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
